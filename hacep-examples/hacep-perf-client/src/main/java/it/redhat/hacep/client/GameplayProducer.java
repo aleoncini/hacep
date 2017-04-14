@@ -18,9 +18,10 @@
 package it.redhat.hacep.client;
 
 import it.redhat.hacep.playground.rules.model.Gameplay;
-import it.redhat.hacep.playground.rules.model.util.GameplayBuilder;
+import it.redhat.hacep.playground.rules.model.util.GameplayBetBuilder;
 
 import javax.jms.*;
+import java.util.Random;
 
 public class GameplayProducer {
 
@@ -49,8 +50,12 @@ public class GameplayProducer {
             Queue destination = session.createQueue(queueName);
             MessageProducer producer = session.createProducer(destination);
             producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
-            Gameplay fact = new GameplayBuilder()
-                    .id(id)
+            Random random = new Random();
+            long bet = new Long(random.nextInt(3)*1000).longValue();
+            long betId = new Long(id).longValue();
+            Gameplay fact = new GameplayBetBuilder()
+                    .id(betId)
+                    .amount(bet)
                     .playerId(playerId)
                     .timestamp(timestamp)
                     .build();

@@ -2,25 +2,28 @@ package it.redhat.hacep.playground.rules.reward.catalog;
 
 import it.redhat.hacep.playground.rules.model.Gameplay;
 import it.redhat.hacep.playground.rules.model.GameplayBet;
+import it.redhat.hacep.playground.rules.model.outcome.PlayerPointLevel;
 
-rule "Basic reward When a user plays a game 5 times in a timeframe of 10 minutes"
+rule "Basic reward When a user plays a game 5 times in a timeframe of 1 minute"
 when
     $gamePlay : Gameplay($playerId : playerId) over window:length(1)
     $numberOfTimes : Number( intValue == 5)
-    				 from accumulate ($gamePlayCount : Gameplay($gamePlay.playerId == playerId) over window:time( 10m ),
+    				 from accumulate ($gamePlayCount : Gameplay($gamePlay.playerId == playerId) over window:time( 1m ),
     				 count($gamePlayCount))
 then
-    System.out.println("=========> HACEP LAB Rule fired (5 events in 10 minutes): " + $gamePlay.getId() + " | COD_931 | " + $gamePlay.getPlayerId());
-    channels["outcomes"].send($playerId + " plays game " + $numberOfTimes+ " times in 10 minutes");
-	channels["audit"].send($gamePlay.getId() + " | COD_931 | " + $gamePlay.getPlayerId() + " | EASY rule consequence.");
+    channels["outcomes"].send($playerId + " plays game " + $numberOfTimes+ " times in 1 minute");
 end
 
-rule "Basic reward When a user bets more than 5000 units in a timeframe of 10 minutes"
+rule "Basic reward When a user bets more than 5000 units in a timeframe of 1 minute"
 when
     $g1 : GameplayBet($playerId : playerId) over window:length(1)
     $totalAmount : Number(intValue >= 5000)
-             from accumulate (GameplayBet($amount : amount) over window:time( 10m ), sum($amount))
+             from accumulate (GameplayBet($amount : amount) over window:time( 1m ), sum($amount))
 then
-    System.out.println("=========> HACEP LAB Rule amount: " + $totalAmount);
-	channels["outcomes"].send($playerId + " bets " + $totalAmount + " coins in a period of 10 minutes");
+	channels["outcomes"].send($playerId + " bets " + $totalAmount + " coins in 1 minute");
+	channels["playerPointsLevel"].send(new PlayerPointLevel(
+	    $playerId,
+	    ($totalAmount.intValue() / 1000) % 10,
+	    ($totalAmount.intValue() / 1000) / 10)
+	);
 end

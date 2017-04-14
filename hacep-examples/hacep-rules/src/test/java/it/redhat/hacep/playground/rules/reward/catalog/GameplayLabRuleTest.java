@@ -50,6 +50,7 @@ public class GameplayLabRuleTest {
         this.session = KieAPITestUtils.buildKieSession(kieBase);
         this.session.registerChannel(AuditChannel.CHANNEL_ID, new AuditChannel());
         this.session.registerChannel(SysoutChannel.CHANNEL_ID, new SysoutChannel());
+        this.session.registerChannel(PointsChannel.CHANNEL_ID, new PointsChannel());
 
         this.rulesFired = new RulesFiredAgendaEventListener();
         this.session.addEventListener(rulesFired);
@@ -57,53 +58,51 @@ public class GameplayLabRuleTest {
     }
 
     @Test
-    public void testUserPlaysGame4TimesIn10Minutes() {
+    public void testUserPlaysGame4TimesIn1Minute() {
         int gameGenerated = 4;
-        int duration = 10;
+        int duration = 1;
 
-        //generate only 4 gameplay events within 10 minutes window
-        //the rule won't fire any consequence
         assertEquals("======: No consequences expected", 0, simulateGames(gameGenerated,duration));
     }
 
     @Test
-    public void testUserPlaysGame6TimesIn10Minutes() {
+    public void testUserPlaysGame6TimesIn1Minute() {
         int gameGenerated = 6;
-        int duration = 10;
+        int duration = 1;
 
         assertEquals("======: At least 1 consequence expected", 1, simulateGames(gameGenerated,duration));
     }
 
     @Test
-    public void testUserPlaysGame6TimesIn15Minutes() {
+    public void testUserPlaysGame6TimesIn2Minutes() {
         int gameGenerated = 6;
-        int duration = 15;
+        int duration = 2;
 
         assertEquals("======: no consequence expected", 0, simulateGames(gameGenerated, duration));
     }
 
     @Test
-    public void testUserPlaysGame12TimesIn30Minutes() {
+    public void testUserPlaysGame6TimesIn2MinutesAndBets() {
         int gameGenerated = 6;
-        int duration = 15;
+        int duration = 2;
         long amount = 2000;
 
         assertEquals("======: a fidelity consequence is expected", 4, simulateGames(10101l, gameGenerated, duration, amount));
     }
 
     @Test
-    public void testUserPlaysGame6TimesIn10MinutesAndBets() {
+    public void testUserPlaysGame6TimesIn1MinuteAndBets() {
         int gameGenerated = 6;
-        int duration = 10;
+        int duration = 1;
         long amount = 1000;
 
         assertEquals("======: At least 1 consequence expected", 3, simulateGames(10101l, gameGenerated,duration,amount));
     }
 
     @Test
-    public void testTwoUsersPlayGame6TimesIn15MinutesAndBetsWithDifferentAmounts() {
-        assertEquals("======: At least 1 consequence expected", 2, simulateGames(30303l, 5,10,1000l));
-        assertEquals("======: At least 1 consequence expected", 4, simulateGames(20202l, 6,15,2000l));
+    public void testTwoUsersPlayGamesAndBets() {
+        assertEquals("======: At least 1 consequence expected", 2, simulateGames(30303l, 5,1,1000l));
+        assertEquals("======: At least 1 consequence expected", 4, simulateGames(20202l, 6,2,2000l));
     }
 
     private int simulateGames(int gameGenerated, int duration) {
