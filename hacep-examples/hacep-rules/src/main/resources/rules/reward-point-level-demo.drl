@@ -10,10 +10,26 @@ when
     				 from accumulate ($gamePlayCount : Gameplay($gamePlay.playerId == playerId) over window:time(30d),
     				 count($gamePlayCount))
 then
-	channels["playerPointsLevel"].send(new PlayerPointLevel(
-	    $playerId,
-	    $numberOfTimes.intValue() % 10,
-	    $numberOfTimes.intValue() / 10)
-	);
+    //channels["outcomes"].send($playerId + " points: " + $numberOfTimes.intValue() % 10 + " level: " + $numberOfTimes.intValue() / 10);
+	channels["playerPointsLevel"].send(new PlayerPointLevel($playerId, $numberOfTimes.intValue() % 10, $numberOfTimes.intValue() / 10) );
 end
 
+rule "Basic reward When a user plays a game 5 times in a timeframe of 1 minute"
+when
+    $gamePlay : Gameplay($playerId : playerId) over window:length(1)
+    $numberOfTimes : Number( intValue == 5)
+    				 from accumulate ($gamePlayCount : Gameplay($gamePlay.playerId == playerId) over window:time( 1m ),
+    				 count($gamePlayCount))
+then
+    channels["outcomes"].send($playerId + " plays game " + $numberOfTimes+ " times in 1 minute");
+end
+
+rule "Basic reward When a user bets more than 5000 units in a timeframe of 1 minute"
+when
+    $g1 : GameplayBet($playerId : playerId) over window:length(1)
+    $totalAmount : Number(intValue >= 5000)
+             from accumulate (GameplayBet($amount : amount) over window:time( 1m ), sum($amount))
+then
+	channels["outcomes"].send($playerId + " bets " + $totalAmount + " coins in 1 minute");
+	//channels["playerPointsLevel"].send(new PlayerPointLevel($playerId,($totalAmount.intValue() / 1000) % 10,($totalAmount.intValue() / 1000) / 10) );
+end

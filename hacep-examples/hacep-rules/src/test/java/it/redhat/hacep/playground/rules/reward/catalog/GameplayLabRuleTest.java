@@ -42,7 +42,7 @@ public class GameplayLabRuleTest {
 
     @BeforeClass
     public static void init() throws Exception {
-        kieBase = KieAPITestUtils.setupKieBase("rules/reward-catalogue.drl", "rules/reward-catalogue-haceplab-rule.drl");
+        kieBase = KieAPITestUtils.setupKieBase("rules/reward-catalogue.drl", "rules/reward-point-level-demo.drl");
     }
 
     @Before
@@ -62,7 +62,7 @@ public class GameplayLabRuleTest {
         int gameGenerated = 4;
         int duration = 1;
 
-        assertEquals("======: No consequences expected", 0, simulateGames(gameGenerated,duration));
+        assertEquals("======: 4 consequences expected", 4, simulateGames(gameGenerated,duration));
     }
 
     @Test
@@ -70,7 +70,7 @@ public class GameplayLabRuleTest {
         int gameGenerated = 6;
         int duration = 1;
 
-        assertEquals("======: At least 1 consequence expected", 1, simulateGames(gameGenerated,duration));
+        assertEquals("======: 7 consequences expected", 7, simulateGames(gameGenerated,duration));
     }
 
     @Test
@@ -78,7 +78,7 @@ public class GameplayLabRuleTest {
         int gameGenerated = 6;
         int duration = 2;
 
-        assertEquals("======: no consequence expected", 0, simulateGames(gameGenerated, duration));
+        assertEquals("======: 6 consequence expected", 6, simulateGames(gameGenerated, duration));
     }
 
     @Test
@@ -87,7 +87,7 @@ public class GameplayLabRuleTest {
         int duration = 2;
         long amount = 2000;
 
-        assertEquals("======: a fidelity consequence is expected", 4, simulateGames(10101l, gameGenerated, duration, amount));
+        assertEquals("======: 10 consequences expected", 10, simulateGames(10101l, gameGenerated, duration, amount));
     }
 
     @Test
@@ -96,13 +96,13 @@ public class GameplayLabRuleTest {
         int duration = 1;
         long amount = 1000;
 
-        assertEquals("======: At least 1 consequence expected", 3, simulateGames(10101l, gameGenerated,duration,amount));
+        assertEquals("======: 9 consequences expected", 9, simulateGames(10101l, gameGenerated,duration,amount));
     }
 
     @Test
     public void testTwoUsersPlayGamesAndBets() {
-        assertEquals("======: At least 1 consequence expected", 2, simulateGames(30303l, 5,1,1000l));
-        assertEquals("======: At least 1 consequence expected", 4, simulateGames(20202l, 6,2,2000l));
+        assertEquals("======: 7 consequence expected", 7, simulateGames(30303l, 5,1,1000l));
+        assertEquals("======: 10 consequences expected", 10, simulateGames(20202l, 6,2,2000l));
     }
 
     private int simulateGames(int gameGenerated, int duration) {
